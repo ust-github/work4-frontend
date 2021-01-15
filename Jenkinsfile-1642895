@@ -1,0 +1,48 @@
+pipeline {
+  agent { label 'chrome' }
+  tools {
+    nodejs 'NodeJS'
+  }
+  stages {
+    stage ('Installing (wxnefw)') {
+      steps {
+        sh script: 'npm install', label: 'r7qc4l'
+      } //end steps
+    } // end stage Installing
+    stage ('Testing (g20iik)') {
+      steps {
+        sh script: 'ng test  --browsers=ChromeHeadless --codeCoverage=true --preserveSymlinks=false --sourceMap=true --watch=false', label: 'ii8non'
+      } //end steps
+    } // end stage Testing
+    stage ('Building (1fq5gs)') {
+      steps {
+        sh script: 'ng build  --aot=false --buildOptimizer=false --commonChunk=true --crossOrigin=none --deleteOutputPath=true --extractCss=false --extractLicenses=false --forkTypeChecker=true --namedChunks=true --outputHashing=none --preserveSymlinks=false --prod=true --serviceWorker=false --sourceMap=true --statsJson=false --subresourceIntegrity=false --vendorChunk=true', label: 'i0f2h3'
+      } //end steps
+    } // end stage Building
+    stage ('Deploy (cr5j7m)') {
+      steps {
+        script {
+		docker.withTool('docker'){
+			docker.withRegistry('https://artifactory.dagility.com', ''){
+				sh 'docker build -t artifactory.dagility.com/docker/work4-frontend:latest .'
+			sh 'docker push artifactory.dagility.com/docker/work4-frontend:latest'
+			}
+		}
+	}
+	script { sh script: 'sleep 0.005', label: '1t2w2u'}
+
+        sh script: 'helm package chart', label: 'yrl20w'
+        withCredentials([   usernamePassword(credentialsId: '', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+   	script {
+		sh "curl -u$USER:$PASS -T work4-frontend-chart-0.1.0.tgz 'https://artifactory.dagility.com/artifactory/helm-local/work4-frontend-chart-0.1.0.tgz' "
+	}
+	script { sh script: 'sleep 0.005', label: 'icoxs7'}
+
+}
+        sh script: 'helm repo add work4-frontend https://artifactory.dagility.com/artifactory/helm', label: 'v8rljh'
+        sh script: 'helm repo update', label: 'xkb2da'
+        sh script: 'helm upgrade work4-frontend-deployment work4-frontend/work4-frontend-chart --install --values chart-values.yaml --namespace monitoring', label: 'j0myop'
+      } //end steps
+    } // end stage Deploy
+  }
+}

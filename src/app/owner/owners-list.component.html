@@ -1,0 +1,25 @@
+<div *ngIf="data && data.length>0; else elseBlock">
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">City Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Telephone</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let owner of data">
+            <td>{{owner.id}}</td>
+            <td>{{owner.firstName}}</td>
+            <td>{{owner.lastName}}</td>
+            <td>{{owner.city}}</td>
+            <td>{{owner.address}}</td>
+            <td>{{owner.telephone}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<ng-template #elseBlock><h2>There is an empty list received</h2></ng-template>
